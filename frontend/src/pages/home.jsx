@@ -17,7 +17,10 @@ import {
 import { TypeWriter } from '@/widgets/message';
 
 export function Home() {
-  const [messages, setMessages] = useState([{ "role": "assistant", "content": "Let me know on how can I help you. Please type in your question below." }]);
+  const [messages, setMessages] = useState([
+    { "role": "system", "content": "You should answer the questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'." },
+    { "role": "assistant", "content": "Let me know on how can I help you. Please type in your question below." }
+  ]);
   const chatWindowRef = useRef(null);
   const [isChatavailable, setIsChatAvailable] = useState(false);
   const [isSecond, setIsSecond] = useState(false);
@@ -36,6 +39,7 @@ export function Home() {
     "What problem/condition are you struggling with?"
   ];
   const [suggestion, setSuggestion] = useState([]);
+  const API_KEY = "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";
 
   const handleDateChange = (date, dateString) => {
     const currentYear = new Date().getFullYear();
@@ -73,15 +77,33 @@ export function Home() {
     }
   };
 
-  const handleProblemKeyDown = (e) => {
+  const handleProblemKeyDown = async (e) => {
     if (e.key == "Enter") {
       setIsChatAvailable(true);
       const prompt = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition. Generate the 7 suggested questions to help him.`;
       setIsloading(true);
-      axios.post("http://18.212.49.246/api/suggest", { prompt: prompt })
-        .then((res) => {
+      const apiRequestBody = {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          messages,
+          { "role": "user", "content": prompt }
+        ]
+      };
+
+      await fetch("https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + API_KEY,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(apiRequestBody)
+        }).then((data) => {
+          return data.json();
+        }).then((data) => {
+          console.log("data---", data);
           let list = [];
-          list = res.data.split("\n");
+          list = data.choices[0].message.content.split("\n");
           setSuggestion(list);
           setIsloading(false);
         }).catch((err) => {
@@ -92,21 +114,39 @@ export function Home() {
     }
   };
 
-  const generateAnswer = (prompt) => {
+  const generateAnswer = async (prompt) => {
+    setIsloading(true);
+    const apiRequestBody = {
+      "model": "gpt-3.5-turbo",
+      "messages": [
+        messages,
+        { "role": "user", "content": prompt }
+      ]
+    };
     let list = messages;
     list.push({ "role": "user", "content": prompt });
     setMessages(list);
-    setIsloading(true);
-    axios.post("http://18.212.49.246/api/new", { prompt: list })
-      .then((res) => {
+
+    await fetch("https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(apiRequestBody)
+      }).then((data) => {
+        return data.json();
+      }).then((data) => {
+        console.log("data---", data);
         let list = messages;
-        list.push({ "role": "assistant", "content": res.data })
+        list.push({ "role": "assistant", "content": data.choices[0].message.content })
         setMessages(list);
         setInput("");
         setIsloading(false);
       }).catch((err) => {
-        setIsloading(false);
         notification.warning({ message: "Failed to generate AI answer" });
+        setIsloading(false);
         console.log(err);
       });
   };
