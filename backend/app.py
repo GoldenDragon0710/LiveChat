@@ -15,7 +15,7 @@ load_dotenv()
 
 def generateSuggestion(prompt):
   message = [
-          {"role": "system", "content": "You should answer the only questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'."}]
+          {"role": "system", "content": "Please provide the 7 best suggestions the customer can ask the bot for health care and wellness."}]
   message.append(prompt)
   response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
@@ -26,7 +26,7 @@ def generateSuggestion(prompt):
 
 def generateAnswer(prompt):
   message = [
-          {"role": "system", "content": "You should answer the only questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'."}]
+          {"role": "system", "content": "You should answer the questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'."}]
   for item in prompt:
     message.append(item)
   response = openai.ChatCompletion.create(

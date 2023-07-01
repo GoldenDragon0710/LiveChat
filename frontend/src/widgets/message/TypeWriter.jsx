@@ -35,7 +35,7 @@ export function TypeWriter(props) {
 
   return <p
     dangerouslySetInnerHTML={{ __html: displayedContent.includes('\n') ? displayedContent.replace(/\n/g, "<br />") : displayedContent }}
-    className="text-[18px] font-normal" />;
+    className="text-[17px] font-normal" />;
 }
 
 TypeWriter.displayName = "/src/widgets/message/TypeWriter.jsx";
