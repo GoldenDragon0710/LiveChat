@@ -15,6 +15,7 @@ import {
   DatePicker,
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
+import { Configuration, OpenAIApi } from "openai";
 
 export function Home() {
   const [messages, setMessages] = useState([
@@ -39,7 +40,11 @@ export function Home() {
     "What problem/condition are you struggling with?"
   ];
   const [suggestion, setSuggestion] = useState([]);
-  const API_KEY = "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";
+  const configuration = new Configuration({
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    // apiKey: "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",
+  });
+  const openai = new OpenAIApi(configuration);
 
   const handleDateChange = (date, dateString) => {
     const currentYear = new Date().getFullYear();
@@ -82,73 +87,43 @@ export function Home() {
       setIsChatAvailable(true);
       const prompt = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition. Generate the 7 suggested questions to help him.`;
       setIsloading(true);
-      const apiRequestBody = {
-        "model": "gpt-3.5-turbo",
-        "messages": [
-          messages,
-          { "role": "user", "content": prompt }
-        ]
-      };
-
-      await fetch("https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + API_KEY,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(apiRequestBody)
-        }).then((data) => {
-          return data.json();
-        }).then((data) => {
-          console.log("data---", data);
-          let list = [];
-          list = data.choices[0].message.content.split("\n");
-          setSuggestion(list);
-          setIsloading(false);
-        }).catch((err) => {
-          notification.warning({ message: "Failed to generate AI answer" });
-          setIsloading(false);
-          console.log(err);
+      const prompt_data = [{ "role": "user", "content": prompt }];
+      try {
+        const result = await openai.createChatCompletion({
+          model: "gpt-3.5-turbo",
+          messages: prompt_data,
         });
+        let list = [];
+        list = result.data.choices[0].message.content.split("\n");
+        setSuggestion(list);
+      } catch (e) {
+        notification.warning({ message: "Failed to generate AI answer" });
+        console.log(e);
+      }
+      setIsloading(false);
     }
   };
 
   const generateAnswer = async (prompt) => {
     setIsloading(true);
-    const apiRequestBody = {
-      "model": "gpt-3.5-turbo",
-      "messages": [
-        messages,
-        { "role": "user", "content": prompt }
-      ]
-    };
     let list = messages;
     list.push({ "role": "user", "content": prompt });
     setMessages(list);
 
-    await fetch("https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + API_KEY,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(apiRequestBody)
-      }).then((data) => {
-        return data.json();
-      }).then((data) => {
-        console.log("data---", data);
-        let list = messages;
-        list.push({ "role": "assistant", "content": data.choices[0].message.content })
-        setMessages(list);
-        setInput("");
-        setIsloading(false);
-      }).catch((err) => {
-        notification.warning({ message: "Failed to generate AI answer" });
-        setIsloading(false);
-        console.log(err);
+    try {
+      const result = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: prompt_data,
       });
+      let list = messages;
+      list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
+      setMessages(list);
+      setInput("");
+    } catch (e) {
+      notification.warning({ message: "Failed to generate AI answer" });
+      console.log(e);
+    }
+    setIsloading(false);
   };
 
   const handleInputKeyDown = (e) => {
