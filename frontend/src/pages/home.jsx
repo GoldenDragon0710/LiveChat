@@ -16,7 +16,7 @@ import {
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
 import { Configuration, OpenAIApi } from "openai";
-import.meta.env.VITE_OPENAI_API_KEY;
+// import.meta.env.VITE_OPENAI_API_KEY;
 
 export function Home() {
   const [messages, setMessages] = useState([
@@ -42,8 +42,8 @@ export function Home() {
   ];
   const [suggestion, setSuggestion] = useState([]);
   const configuration = new Configuration({
-    apiKey: VITE_OPENAI_API_KEY,
-    // apiKey: "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",
+    // apiKey: VITE_OPENAI_API_KEY,
+    apiKey: "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",
   });
   const openai = new OpenAIApi(configuration);
 
