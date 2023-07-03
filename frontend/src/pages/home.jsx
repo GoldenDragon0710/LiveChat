@@ -43,7 +43,7 @@ export function Home() {
   const [suggestion, setSuggestion] = useState([]);
   const configuration = new Configuration({
     // apiKey: VITE_OPENAI_API_KEY,
-    apiKey: "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",
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
   });
   const openai = new OpenAIApi(configuration);
 
@@ -94,7 +94,6 @@ export function Home() {
           model: "gpt-3.5-turbo",
           messages: prompt_data,
         });
-        console.log("result---", result.data.choices[0].message.content);
         let list = [];
         list = result.data.choices[0].message.content.split("\n");
         setSuggestion(list);
@@ -117,7 +116,6 @@ export function Home() {
         model: "gpt-3.5-turbo",
         messages: prompt_data,
       });
-      console.log("result.data.choices[0].message.content----", result.data.choices[0].message.content);
       let list = messages;
       list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
       setMessages(list);
@@ -206,8 +204,10 @@ export function Home() {
               <div className='w-full flex mb-3' key={idx}>
                 {
                   item.role == "assistant" && (
-                    <div className='w-full mr-[50px] flex items-end'>
-                      <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+                    <div className='w-full mr-[50px] flex'>
+                      <div className='h-full items-end'>
+                        <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+                      </div>
                       <div className='flex flex-col w-fit h-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
                         <TypeWriter content={item.content} box_ref={chatWindowRef} speed={5} />
                       </div>
