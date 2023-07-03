@@ -93,6 +93,7 @@ export function Home() {
           model: "gpt-3.5-turbo",
           messages: prompt_data,
         });
+        console.log("result---", result.data.choices[0].message.content);
         let list = [];
         list = result.data.choices[0].message.content.split("\n");
         setSuggestion(list);
@@ -106,15 +107,16 @@ export function Home() {
 
   const generateAnswer = async (prompt) => {
     setIsloading(true);
-    let list = messages;
-    list.push({ "role": "user", "content": prompt });
-    setMessages(list);
+    let prompt_data = messages;
+    prompt_data.push({ "role": "user", "content": prompt });
+    setMessages(prompt_data);
 
     try {
       const result = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: prompt_data,
       });
+      console.log("result.data.choices[0].message.content----", result.data.choices[0].message.content);
       let list = messages;
       list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
       setMessages(list);
