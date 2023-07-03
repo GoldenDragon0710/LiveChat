@@ -15,7 +15,7 @@ load_dotenv()
 
 def generateSuggestion(prompt):
   message = [
-          {"role": "system", "content": "Please provide the 7 best suggestions the customer can ask the bot for health care and wellness. Write suggestions only, no numerical order labels and no quote"}]
+          {"role": "system", "content": "Please provide the 7 best suggestions the customer can ask the bot for health care and wellness."}]
   message.append(prompt)
   response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",

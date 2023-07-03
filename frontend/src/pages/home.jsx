@@ -40,10 +40,9 @@ export function Home() {
     "What problem/condition are you struggling with?"
   ];
   const [suggestion, setSuggestion] = useState([]);
-  const API_KEY = "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";
   const configuration = new Configuration({
-    // apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-    apiKey: "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",
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    // apiKey: "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",
   });
   const openai = new OpenAIApi(configuration);
 
@@ -88,36 +87,45 @@ export function Home() {
       setIsChatAvailable(true);
       const prompt = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition. Generate the 7 suggested questions to help him.`;
       setIsloading(true);
-      const prompt_data = [{"role": "user", "content": prompt}];
+      const prompt_data = [{ "role": "user", "content": prompt }];
       try {
         const result = await openai.createChatCompletion({
           model: "gpt-3.5-turbo",
           messages: prompt_data,
         });
-        console.log("response----", result.data.choices[0].message.content);
+        console.log("result---", result.data.choices[0].message.content);
+        let list = [];
+        list = result.data.choices[0].message.content.split("\n");
+        setSuggestion(list);
       } catch (e) {
+        notification.warning({ message: "Failed to generate AI answer" });
         console.log(e);
       }
+      setIsloading(false);
     }
   };
 
-  const generateAnswer = (prompt) => {
-    let list = messages;
-    list.push({ "role": "user", "content": prompt });
-    setMessages(list);
+  const generateAnswer = async (prompt) => {
     setIsloading(true);
-    axios.post("http://18.212.49.246/api/new", { prompt: list })
-      .then((res) => {
-        let list = messages;
-        list.push({ "role": "assistant", "content": res.data })
-        setMessages(list);
-        setInput("");
-        setIsloading(false);
-      }).catch((err) => {
-        setIsloading(false);
-        notification.warning({ message: "Failed to generate AI answer" });
-        console.log(err);
+    let prompt_data = messages;
+    prompt_data.push({ "role": "user", "content": prompt });
+    setMessages(prompt_data);
+
+    try {
+      const result = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: prompt_data,
       });
+      console.log("result.data.choices[0].message.content----", result.data.choices[0].message.content);
+      let list = messages;
+      list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
+      setMessages(list);
+      setInput("");
+    } catch (e) {
+      notification.warning({ message: "Failed to generate AI answer" });
+      console.log(e);
+    }
+    setIsloading(false);
   };
 
   const handleInputKeyDown = (e) => {

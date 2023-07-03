@@ -16,10 +16,6 @@ export function Navbar() {
   );
 }
 
-Navbar.propTypes = {
-  routes: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
-
 Navbar.displayName = "/src/widgets/layout/navbar.jsx";
 
 export default Navbar;

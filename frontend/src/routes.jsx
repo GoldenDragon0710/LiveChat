@@ -1,6 +1,6 @@
-import { 
+import {
   Home,
- } from "@/pages";
+} from "@/pages";
 import {
   HomeIcon,
 } from "@heroicons/react/24/solid";
@@ -8,7 +8,7 @@ import {
 export const routes = [
   {
     icon: HomeIcon,
-    path: "/",
+    path: "/livechat/",
     element: <Home />,
   },
 ];
