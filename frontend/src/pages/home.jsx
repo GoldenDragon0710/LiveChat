@@ -9,15 +9,19 @@ import {
   Option,
   Input,
 } from "@material-tailwind/react";
-import {MyLoader} from "@/widgets/loader/MyLoader";
+import { MyLoader } from "@/widgets/loader/MyLoader";
 import {
   notification,
   DatePicker,
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
+import { Configuration, OpenAIApi } from "openai";
 
 export function Home() {
-  const [messages, setMessages] = useState([{"role":"assistant", "content":"Let me know on how can I help you. Please type in your question below."}]);
+  const [messages, setMessages] = useState([
+    { "role": "system", "content": "You should answer the questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'." },
+    { "role": "assistant", "content": "Let me know on how can I help you. Please type in your question below." }
+  ]);
   const chatWindowRef = useRef(null);
   const [isChatavailable, setIsChatAvailable] = useState(false);
   const [isSecond, setIsSecond] = useState(false);
@@ -36,6 +40,12 @@ export function Home() {
     "What problem/condition are you struggling with?"
   ];
   const [suggestion, setSuggestion] = useState([]);
+  const API_KEY = "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";
+  const configuration = new Configuration({
+    // apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    apiKey: "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",
+  });
+  const openai = new OpenAIApi(configuration);
 
   const handleDateChange = (date, dateString) => {
     const currentYear = new Date().getFullYear();
@@ -73,34 +83,41 @@ export function Home() {
     }
   };
 
-  const handleProblemKeyDown = (e) => {
-    if(e.key == "Enter") {
+  const handleProblemKeyDown = async (e) => {
+    if (e.key == "Enter") {
       setIsChatAvailable(true);
       const prompt = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition. Generate the 7 suggested questions to help him.`;
       setIsloading(true);
-      axios.post("http://127.0.0.1:5000/api/suggest", {prompt: prompt})
-      .then((res) => {
-        let list = [];
-        list = res.data.split("\n");
-        setSuggestion(list);
-        setIsloading(false);
-      }).catch((err) => console.log(err));
+      const prompt_data = [{"role": "user", "content": prompt}];
+      try {
+        const result = await openai.createChatCompletion({
+          model: "gpt-3.5-turbo",
+          messages: prompt_data,
+        });
+        console.log("response----", result.data.choices[0].message.content);
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
   const generateAnswer = (prompt) => {
     let list = messages;
-    list.push({"role": "user","content": prompt});
+    list.push({ "role": "user", "content": prompt });
     setMessages(list);
     setIsloading(true);
-    axios.post("http://127.0.0.1:5000/api/new", {prompt: list})
+    axios.post("http://18.212.49.246/api/new", { prompt: list })
       .then((res) => {
         let list = messages;
-        list.push({"role": "assistant", "content": res.data})
+        list.push({ "role": "assistant", "content": res.data })
         setMessages(list);
         setInput("");
         setIsloading(false);
-      }).catch((err) => console.log(err));
+      }).catch((err) => {
+        setIsloading(false);
+        notification.warning({ message: "Failed to generate AI answer" });
+        console.log(err);
+      });
   };
 
   const handleInputKeyDown = (e) => {
@@ -115,27 +132,27 @@ export function Home() {
 
   return (
     <>
-      <div ref={chatWindowRef} className="relative container mx-auto px-40 py-4 flex flex-col items-center">
+      <div ref={chatWindowRef} className="relative container mx-auto p-4 flex flex-col items-center">
         <div className='w-full flex my-3'>
-          <Avatar src='img/Chatbot.svg' className='w-[80px] mx-5 mt-2'/>
-          <div className='flex flex-col mx-5 w-full'>
-            <Typography variant="h5" className="font-normal my-1 text-[18px]">{initQuestions[0]}</Typography>
+          <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+          <div className='flex flex-col mr-3 sm:mr-5 w-full'>
+            <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[0]}</Typography>
             <Input
               label='Full Name'
               value={fullName}
               onKeyDown={handleFullNameKeyDown}
               onChange={handleFullNameChange}
-              className="w-full text-[18px]"
+              className="w-full"
             />
           </div>
         </div>
         {
           isSecond && (
             <div className='w-full flex my-3'>
-              <Avatar src='img/Chatbot.svg' className='w-[68px] mx-5 mt-2'/>
-              <div className='flex flex-col mx-5'>
-                <Typography variant="h5" className="font-normal my-1">{initQuestions[1]}</Typography>
-                <DatePicker onChange={handleDateChange} onKeyDown={handleDateKeyDown} className='w-[300px] text-[18px]'/>
+              <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+              <div className='flex flex-col mr-3 sm:mr-5 w-full'>
+                <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[1]}</Typography>
+                <DatePicker onChange={handleDateChange} onKeyDown={handleDateKeyDown} className='min-w-[200px]' />
               </div>
             </div>
           )
@@ -143,15 +160,15 @@ export function Home() {
         {
           isThird && (
             <div className='w-full flex my-3'>
-              <Avatar src='img/Chatbot.svg' className='w-[80px] mx-5 mt-2'/>
-              <div className='flex flex-col mx-5 w-full'>
-                <Typography variant="h5" className="font-normal my-1 text-[18px]">{initQuestions[2]}</Typography>
+              <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+              <div className='flex flex-col mr-3 sm:mr-5 w-full'>
+                <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[2]}</Typography>
                 <Input
                   label='Country'
                   value={country}
                   onKeyDown={handleCountryKeyDown}
                   onChange={handleCountryChange}
-                  className="w-full text-[18px]"
+                  className="w-full"
                 />
               </div>
             </div>
@@ -159,16 +176,16 @@ export function Home() {
         }
         {
           isFourth && (
-            <div className='w-full flex my-3'>
-              <Avatar src='img/Chatbot.svg' className='w-[80px] mx-5 mt-2'/>
-              <div className='flex flex-col mx-5 w-full'>
-                <Typography variant="h5" className="font-normal my-1 text-[18px]">{initQuestions[3]}</Typography>
+            <div className='w-full flex mt-3 mb-8'>
+              <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+              <div className='flex flex-col mr-3 sm:mr-5 w-full'>
+                <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[3]}</Typography>
                 <Input
                   label='Problem'
                   value={problem}
                   onKeyDown={handleProblemKeyDown}
                   onChange={handleProblemChange}
-                  className="w-full text-[18px]"
+                  className="w-full"
                 />
               </div>
             </div>
@@ -176,51 +193,50 @@ export function Home() {
         }
         {
           isChatavailable && messages && messages.map((item, idx) => {
-            return(
-              <div className='w-full flex my-3' key={idx}>
+            return (
+              <div className='w-full flex mb-3' key={idx}>
                 {
                   item.role == "assistant" && (
-                    <>
-                      <Avatar src='img/Chatbot.svg' className='w-[68px] mx-5'/>
-                      <div className='flex flex-col mx-5 mt-2 w-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
+                    <div className='w-full mr-[50px] flex items-end'>
+                      <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+                      <div className='flex flex-col w-fit h-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
                         <TypeWriter content={item.content} box_ref={chatWindowRef} speed={5} />
                       </div>
-                    </>
+                    </div>
                   )
                 }
                 {
                   item.role == "user" && (
-                    <div className='w-full flex justify-end'>
+                    <div className='w-full flex justify-end pl-[100px]'>
                       <div className='w-fit bg-blue-500 text-[#ffffff] rounded-3xl px-5 py-2'>
                         <div
                           dangerouslySetInnerHTML={{ __html: item.content.includes('\n') ? item.content.replace(/\n/g, "<br />") : item.content }}
-                          className="text-[18px] font-normal"
+                          className="text-[17px] font-normal"
                         />
                       </div>
                     </div>
                   )
                 }
-                
+
               </div>
             )
           })
         }
         {
-          isloading && (<MyLoader isloading={isloading}/>)
+          isloading && (<MyLoader isloading={isloading} />)
         }
         {
           isChatavailable && (
-            <div className='w-full flex relative my-3'>
-              <div className='w-full mx-5'>
+            <div className='w-full flex relative my-3 '>
+              <div className='w-full mx-3 sm:mx-5'>
                 <Input
                   label='Type your message.'
                   value={input}
                   onKeyDown={handleInputKeyDown}
                   onChange={handleInputChange}
-                  className='text-[18px]'
                 />
               </div>
-              <Button onClick={() => generateAnswer(input)} className='text-[20px] normal-case w-[100px] px-[20px] py-[5px] mx-5'>Send</Button>
+              <Button onClick={() => generateAnswer(input)} className='text-[20px] normal-case w-[100px] px-[20px] py-[5px] mx-3 sm:mx-5'>Send</Button>
             </div>
           )
         }
@@ -231,7 +247,7 @@ export function Home() {
           suggestion && suggestion.map((item, idx) => {
             return (
               <div key={idx} onClick={() => generateAnswer(item)} className='w-full my-2 border-[#b0bec5] border-solid border-2 rounded-xl px-3 py-2 hover: cursor-pointer hover:bg-[#b0bec587]'>
-                <Typography className="text-[18px] font-normal">
+                <Typography className="text-[17px] font-normal">
                   {item}
                 </Typography>
               </div>
