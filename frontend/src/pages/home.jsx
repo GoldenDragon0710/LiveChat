@@ -13,6 +13,7 @@ import { MyLoader } from "@/widgets/loader/MyLoader";
 import {
   notification,
   DatePicker,
+  InputNumber
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
 import { Configuration, OpenAIApi } from "openai";
@@ -47,9 +48,8 @@ export function Home() {
   });
   const openai = new OpenAIApi(configuration);
 
-  const handleDateChange = (date, dateString) => {
-    const currentYear = new Date().getFullYear();
-    setAge(currentYear - parseInt(dateString.slice(0, 4)));
+  const handleDateChange = (value) => {
+    setAge(value);
     setIsThird(true);
   };
 
@@ -68,12 +68,6 @@ export function Home() {
   const handleFullNameKeyDown = (e) => {
     if (e.key == "Enter") {
       setIsSecond(true);
-    }
-  };
-
-  const handleDateKeyDown = (e) => {
-    if (e.key == "Enter") {
-      setIsThird(true);
     }
   };
 
@@ -159,7 +153,7 @@ export function Home() {
               <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[1]}</Typography>
-                <DatePicker onChange={handleDateChange} onKeyDown={handleDateKeyDown} className='min-w-[200px]' />
+                <InputNumber min={1} max={100} defaultValue={18} onChange={handleDateChange} className='min-w-[200px]' />
               </div>
             </div>
           )
