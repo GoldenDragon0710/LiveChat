@@ -43,7 +43,7 @@ export function Home() {
   const [suggestion, setSuggestion] = useState([]);
   const configuration = new Configuration({
     // apiKey: VITE_OPENAI_API_KEY,
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    apiKey: "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",
   });
   const openai = new OpenAIApi(configuration);
 
@@ -87,13 +87,20 @@ export function Home() {
 
   const generateSuggestions = async () => {
     setIsChatAvailable(true);
-    const prompt = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition. Generate the 7 suggested questions to help him.`;
+    const system_content = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition.`;
     setIsloading(true);
-    const prompt_data = [{ "role": "user", "content": prompt }];
+    // Generate the 7 suggested questions to help him.
+    let msgs = [];
+    msgs.push({ "role": "system", "content": system_content });
+    setMessages(msgs);
+    let prompt_data = { "role": "user", "content": "Generate the 7 suggested questions to help him." };
     try {
       const result = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: prompt_data,
+        messages: {
+          msgs,
+          prompt_data
+        },
       });
       let list = [];
       list = result.data.choices[0].message.content.split("\n");
@@ -106,7 +113,7 @@ export function Home() {
   };
 
   const handleProblemKeyDown = (e) => {
-    if (e.key == "Enter") {
+    if (e.key == "Enter" && problem != "") {
       generateSuggestions();
     }
   };
