@@ -43,7 +43,7 @@ export function Home() {
   const [suggestion, setSuggestion] = useState([]);
   const configuration = new Configuration({
     // apiKey: VITE_OPENAI_API_KEY,
-    apiKey: "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",
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
   });
   const openai = new OpenAIApi(configuration);
 
@@ -87,20 +87,20 @@ export function Home() {
 
   const generateSuggestions = async () => {
     setIsChatAvailable(true);
-    const system_content = `The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition.`;
+    const prompt = { "role": "user", "content": "Generate the 7 suggested questions to help him." };
+    const init = [
+      { "role": "system", "content": `You should answer the questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'. The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition.` },
+      { "role": "assistant", "content": "Let me know on how can I help you. Please type in your question below." },
+    ];
+    setMessages(init);
     setIsloading(true);
-    // Generate the 7 suggested questions to help him.
-    let msgs = [];
-    msgs.push({ "role": "system", "content": system_content });
-    setMessages(msgs);
-    let prompt_data = { "role": "user", "content": "Generate the 7 suggested questions to help him." };
     try {
       const result = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: {
-          msgs,
-          prompt_data
-        },
+        messages: [
+          ...init,
+          prompt
+        ]
       });
       let list = [];
       list = result.data.choices[0].message.content.split("\n");
