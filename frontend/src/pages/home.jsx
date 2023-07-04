@@ -73,6 +73,7 @@ export function Home() {
 
   const handleCountryChange = (e) => {
     setCountry(e);
+    setIsFourth(true);
   };
 
   const handleProblemChange = (e) => {
