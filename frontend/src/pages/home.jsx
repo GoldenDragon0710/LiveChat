@@ -1,22 +1,21 @@
 import React, { useState, useRef } from 'react'
 import axios from 'axios';
 import {
-  Textarea,
   Button,
   Avatar,
   Typography,
   Select,
   Option,
   Input,
-  MenuItem,
 } from "@material-tailwind/react";
 import { MyLoader } from "@/widgets/loader/MyLoader";
 import {
   notification,
-  DatePicker,
+  InputNumber
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
 import { Configuration, OpenAIApi } from "openai";
+// import.meta.env.VITE_OPENAI_API_KEY;
 
 import countries from "i18n-iso-countries";
 import enLocale from "i18n-iso-countries/langs/en.json";
@@ -46,15 +45,15 @@ export function Home() {
   ];
   const [suggestion, setSuggestion] = useState([]);
   const configuration = new Configuration({
-    // apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-    apiKey: "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",
+    // apiKey: VITE_OPENAI_API_KEY,
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
   });
   const openai = new OpenAIApi(configuration);
 
   countries.registerLocale(enLocale);
   countries.registerLocale(itLocale);
 
-  const countryobj = countries.getNames("en", {select: "official"});
+  const countryobj = countries.getNames("en", { select: "official" });
   const countryArr = Object.entries(countryobj).map(([key, value]) => {
     return {
       label: value,
@@ -62,10 +61,11 @@ export function Home() {
     };
   });
 
-  const handleDateChange = (date, dateString) => {
-    const currentYear = new Date().getFullYear();
-    setAge(currentYear - parseInt(dateString.slice(0, 4)));
-    setIsThird(true);
+  const handleDateChange = (value) => {
+    setTimeout(() => {
+      setAge(value);
+      setIsThird(true);
+    }, 1000);
   };
 
   const handleFullNameChange = (e) => {
@@ -74,8 +74,8 @@ export function Home() {
 
   const handleCountryChange = (e) => {
     setTimeout(() => {
-      setIsFourth(true);
       setCountry(e);
+      setIsFourth(true);
     }, 1000);
   };
 
@@ -87,14 +87,6 @@ export function Home() {
     if (e.key == "Enter") {
       setTimeout(() => {
         setIsSecond(true);
-      }, 1000);
-    }
-  };
-
-  const handleDateKeyDown = (e) => {
-    if (e.key == "Enter") {
-      setTimeout(() => {
-        setIsThird(true);
       }, 1000);
     }
   };
@@ -175,7 +167,7 @@ export function Home() {
               <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[1]}</Typography>
-                <DatePicker onChange={handleDateChange} onKeyDown={handleDateKeyDown} className='min-w-[200px]' />
+                <InputNumber min={1} max={100} defaultValue={18} onChange={handleDateChange} className='min-w-[200px]' />
               </div>
             </div>
           )
@@ -186,7 +178,6 @@ export function Home() {
               <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[2]}</Typography>
- 
                 <Select
                   label='Country'
                   value={country}
@@ -194,14 +185,13 @@ export function Home() {
                   className='w-full'
                 >
                   {
-                    !!countryArr?.length &&
-                      countryArr.map(({label, value}) => {
-                        return (
-                          <Option key={value} value={value}>
-                            {label}
-                          </Option>
-                        )
-                      })
+                    !!countryArr?.length && countryArr.map(({ label, value }) => {
+                      return (
+                        <Option key={value} value={label}>
+                          {label}
+                        </Option>
+                      )
+                    })
                   }
                 </Select>
               </div>
@@ -231,8 +221,10 @@ export function Home() {
               <div className='w-full flex mb-3' key={idx}>
                 {
                   item.role == "assistant" && (
-                    <div className='w-full mr-[50px] flex items-end'>
-                      <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+                    <div className='w-full mr-[50px] flex'>
+                      <div className='h-full items-end'>
+                        <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+                      </div>
                       <div className='flex flex-col w-fit h-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
                         <TypeWriter content={item.content} box_ref={chatWindowRef} speed={5} />
                       </div>
@@ -251,7 +243,6 @@ export function Home() {
                     </div>
                   )
                 }
-
               </div>
             )
           })
@@ -288,9 +279,6 @@ export function Home() {
             )
           })
         }
-      </div>
-      <div>
-
       </div>
     </>
   );
