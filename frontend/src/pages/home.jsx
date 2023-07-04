@@ -225,8 +225,10 @@ export function Home() {
                       <div className='h-full flex items-end'>
                         <Avatar src='img/doctor.jpeg' className='h-[50px] w-[38px] mr-3 sm:h-[80px] sm:w-[60px] sm:mr-5' />
                       </div>
-                      <div className='flex flex-col w-fit h-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
-                        <TypeWriter content={item.content} box_ref={chatWindowRef} speed={5} />
+                      <div className='h-full flex items-center'>
+                        <div className='flex flex-col w-fit h-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
+                          <TypeWriter content={item.content} box_ref={chatWindowRef} speed={5} />
+                        </div>
                       </div>
                     </div>
                   )
