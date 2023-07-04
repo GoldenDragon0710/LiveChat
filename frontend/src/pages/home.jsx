@@ -1,23 +1,25 @@
 import React, { useState, useRef } from 'react'
 import axios from 'axios';
 import {
-  Textarea,
   Button,
   Avatar,
   Typography,
   Select,
-  Option,
+  MenuItem,
   Input,
 } from "@material-tailwind/react";
 import { MyLoader } from "@/widgets/loader/MyLoader";
 import {
   notification,
-  DatePicker,
   InputNumber
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
 import { Configuration, OpenAIApi } from "openai";
 // import.meta.env.VITE_OPENAI_API_KEY;
+
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+import itLocale from "i18n-iso-countries/langs/it.json";
 
 export function Home() {
   const [messages, setMessages] = useState([
@@ -47,6 +49,17 @@ export function Home() {
     apiKey: process.env.REACT_APP_OPENAI_API_KEY,
   });
   const openai = new OpenAIApi(configuration);
+
+  countries.registerLocale(enLocale);
+  countries.registerLocale(itLocale);
+
+  const countryobj = countries.getNames("en", { select: "official" });
+  const countryArr = Object.entries(countryobj).map(([key, value]) => {
+    return {
+      label: value,
+      value: key
+    };
+  });
 
   const handleDateChange = (value) => {
     setAge(value);
@@ -164,13 +177,21 @@ export function Home() {
               <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[2]}</Typography>
-                <Input
+                <Select
                   label='Country'
                   value={country}
-                  onKeyDown={handleCountryKeyDown}
                   onChange={handleCountryChange}
-                  className="w-full"
-                />
+                  className='w-full'
+                >
+                  {
+                    !!countryArr?.length &&
+                    countryArr.map(({ label, value }) => {
+                      <MenuItem key={value} value={value}>
+                        {label}
+                      </MenuItem>
+                    })
+                  }
+                </Select>
               </div>
             </div>
           )
