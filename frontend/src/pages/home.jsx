@@ -149,7 +149,7 @@ export function Home() {
     <>
       <div ref={chatWindowRef} className="relative container mx-auto p-4 flex flex-col items-center">
         <div className='w-full flex my-3'>
-          <Avatar src='img/doctor.jpeg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+          <Avatar src='img/doctor.jpeg' className='h-[50px] w-[38px] mr-3 sm:h-[80px] sm:w-[60px] sm:mr-5' />
           <div className='flex flex-col mr-3 sm:mr-5 w-full'>
             <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[0]}</Typography>
             <Input
@@ -164,7 +164,7 @@ export function Home() {
         {
           isSecond && (
             <div className='w-full flex my-3'>
-              <Avatar src='img/doctor.jpeg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+              <Avatar src='img/doctor.jpeg' className='h-[50px] w-[38px] mr-3 sm:h-[80px] sm:w-[60px] sm:mr-5' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[1]}</Typography>
                 <InputNumber min={1} max={100} defaultValue={18} onChange={handleDateChange} className='min-w-[200px]' />
@@ -175,7 +175,7 @@ export function Home() {
         {
           isThird && (
             <div className='w-full flex my-3'>
-              <Avatar src='img/doctor.jpeg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+              <Avatar src='img/doctor.jpeg' className='h-[50px] w-[38px] mr-3 sm:h-[80px] sm:w-[60px] sm:mr-5' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[2]}</Typography>
                 <Select
@@ -201,7 +201,7 @@ export function Home() {
         {
           isFourth && (
             <div className='w-full flex mt-3 mb-8'>
-              <Avatar src='img/doctor.jpeg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+              <Avatar src='img/doctor.jpeg' className='h-[50px] w-[38px] mr-3 sm:h-[80px] sm:w-[60px] sm:mr-5' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[3]}</Typography>
                 <Input
@@ -222,8 +222,8 @@ export function Home() {
                 {
                   item.role == "assistant" && (
                     <div className='w-full mr-[50px] flex'>
-                      <div className='h-full items-end'>
-                        <Avatar src='img/doctor.jpeg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
+                      <div className='h-full flex items-end'>
+                        <Avatar src='img/doctor.jpeg' className='h-[50px] w-[38px] mr-3 sm:h-[80px] sm:w-[60px] sm:mr-5' />
                       </div>
                       <div className='flex flex-col w-fit h-fit rounded-3xl px-5 py-2 bg-[#8080806e]'>
                         <TypeWriter content={item.content} box_ref={chatWindowRef} speed={5} />
