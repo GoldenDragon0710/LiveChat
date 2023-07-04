@@ -63,8 +63,10 @@ export function Home() {
   });
 
   const handleDateChange = (value) => {
-    setAge(value);
-    setIsThird(true);
+    setTimeout(() => {
+      setAge(value);
+      setIsThird(true);
+    }, 1000);
   };
 
   const handleFullNameChange = (e) => {
@@ -72,8 +74,10 @@ export function Home() {
   };
 
   const handleCountryChange = (e) => {
-    setCountry(e);
-    setIsFourth(true);
+    setTimeout(() => {
+      setCountry(e);
+      setIsFourth(true);
+    }, 1000);
   };
 
   const handleProblemChange = (e) => {
@@ -82,13 +86,9 @@ export function Home() {
 
   const handleFullNameKeyDown = (e) => {
     if (e.key == "Enter") {
-      setIsSecond(true);
-    }
-  };
-
-  const handleCountryKeyDown = (e) => {
-    if (e.key == "Enter") {
-      setIsFourth(true);
+      setTimeout(() => {
+        setIsSecond(true);
+      }, 1000);
     }
   };
 
@@ -244,7 +244,6 @@ export function Home() {
                     </div>
                   )
                 }
-
               </div>
             )
           })
@@ -281,9 +280,6 @@ export function Home() {
             )
           })
         }
-      </div>
-      <div>
-
       </div>
     </>
   );
