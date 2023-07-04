@@ -5,6 +5,7 @@ import {
   Avatar,
   Typography,
   Select,
+  Option,
   MenuItem,
   Input,
 } from "@material-tailwind/react";
@@ -71,7 +72,7 @@ export function Home() {
   };
 
   const handleCountryChange = (e) => {
-    setCountry(e.target.value);
+    setCountry(e);
   };
 
   const handleProblemChange = (e) => {
@@ -184,10 +185,10 @@ export function Home() {
                   className='w-full'
                 >
                   {
-                    countryArr.length != 0 && countryArr.map(({ label, value }) => {
-                      <MenuItem key={value} value={value}>
+                    !!countryArr?.length && countryArr.map(({ label, value }) => {
+                      <Option key={value} value={label}>
                         {label}
-                      </MenuItem>
+                      </Option>
                     })
                   }
                 </Select>
