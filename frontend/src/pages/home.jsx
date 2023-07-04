@@ -186,9 +186,11 @@ export function Home() {
                 >
                   {
                     !!countryArr?.length && countryArr.map(({ label, value }) => {
-                      <Option key={value} value={label}>
-                        {label}
-                      </Option>
+                      return (
+                        <Option key={value} value={label}>
+                          {label}
+                        </Option>
+                      )
                     })
                   }
                 </Select>
