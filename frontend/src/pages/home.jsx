@@ -8,6 +8,7 @@ import {
   Select,
   Option,
   Input,
+  MenuItem,
 } from "@material-tailwind/react";
 import { MyLoader } from "@/widgets/loader/MyLoader";
 import {
@@ -16,6 +17,10 @@ import {
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
 import { Configuration, OpenAIApi } from "openai";
+
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+import itLocale from "i18n-iso-countries/langs/it.json";
 
 export function Home() {
   const [messages, setMessages] = useState([
@@ -41,10 +46,21 @@ export function Home() {
   ];
   const [suggestion, setSuggestion] = useState([]);
   const configuration = new Configuration({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-    // apiKey: "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",
+    // apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    apiKey: "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",
   });
   const openai = new OpenAIApi(configuration);
+
+  countries.registerLocale(enLocale);
+  countries.registerLocale(itLocale);
+
+  const countryobj = countries.getNames("en", {select: "official"});
+  const countryArr = Object.entries(countryobj).map(([key, value]) => {
+    return {
+      label: value,
+      value: key
+    };
+  });
 
   const handleDateChange = (date, dateString) => {
     const currentYear = new Date().getFullYear();
@@ -57,7 +73,10 @@ export function Home() {
   };
 
   const handleCountryChange = (e) => {
-    setCountry(e.target.value);
+    setTimeout(() => {
+      setIsFourth(true);
+      setCountry(e);
+    }, 1000);
   };
 
   const handleProblemChange = (e) => {
@@ -66,19 +85,17 @@ export function Home() {
 
   const handleFullNameKeyDown = (e) => {
     if (e.key == "Enter") {
-      setIsSecond(true);
+      setTimeout(() => {
+        setIsSecond(true);
+      }, 1000);
     }
   };
 
   const handleDateKeyDown = (e) => {
     if (e.key == "Enter") {
-      setIsThird(true);
-    }
-  };
-
-  const handleCountryKeyDown = (e) => {
-    if (e.key == "Enter") {
-      setIsFourth(true);
+      setTimeout(() => {
+        setIsThird(true);
+      }, 1000);
     }
   };
 
@@ -93,7 +110,6 @@ export function Home() {
           model: "gpt-3.5-turbo",
           messages: prompt_data,
         });
-        console.log("result---", result.data.choices[0].message.content);
         let list = [];
         list = result.data.choices[0].message.content.split("\n");
         setSuggestion(list);
@@ -116,7 +132,6 @@ export function Home() {
         model: "gpt-3.5-turbo",
         messages: prompt_data,
       });
-      console.log("result.data.choices[0].message.content----", result.data.choices[0].message.content);
       let list = messages;
       list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
       setMessages(list);
@@ -171,13 +186,24 @@ export function Home() {
               <Avatar src='img/Chatbot.svg' className='h-[50px] w-[50px] mr-3 sm:h-[80px] sm:w-[80px] sm:mr-5 mt-2' />
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[2]}</Typography>
-                <Input
+ 
+                <Select
                   label='Country'
                   value={country}
-                  onKeyDown={handleCountryKeyDown}
                   onChange={handleCountryChange}
-                  className="w-full"
-                />
+                  className='w-full'
+                >
+                  {
+                    !!countryArr?.length &&
+                      countryArr.map(({label, value}) => {
+                        return (
+                          <Option key={value} value={value}>
+                            {label}
+                          </Option>
+                        )
+                      })
+                  }
+                </Select>
               </div>
             </div>
           )
