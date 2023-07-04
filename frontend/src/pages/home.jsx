@@ -184,7 +184,6 @@ export function Home() {
                   className='w-full'
                 >
                   {
-                    !!countryArr?.length &&
                     countryArr.map(({ label, value }) => {
                       <MenuItem key={value} value={value}>
                         {label}
