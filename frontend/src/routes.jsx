@@ -8,7 +8,7 @@ import {
 export const routes = [
   {
     icon: HomeIcon,
-    path: "/",
+    path: "/livechat",
     element: <Home />,
   },
 ];
