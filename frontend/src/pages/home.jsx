@@ -127,11 +127,11 @@ export function Home() {
       let list = messages;
       list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
       setMessages(list);
-      setInput("");
     } catch (e) {
       notification.warning({ message: "Failed to generate AI answer" });
       console.log(e);
     }
+    setInput("");
     setIsloading(false);
   };
 
