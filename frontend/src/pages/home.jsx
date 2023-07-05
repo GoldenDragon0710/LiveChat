@@ -212,7 +212,7 @@ export function Home() {
               <div className='flex flex-col mr-3 sm:mr-5 w-full'>
                 <Typography variant="h5" className="font-normal my-1 text-[17px]">{initQuestions[1]}</Typography>
                 <div className='w-full flex'>
-                  <InputNumber min={1} max={100} defaultValue={18} onChange={handleDateChange} className='min-w-[200px]' />
+                  <InputNumber min={1} max={100} defaultValue={18} onChange={handleDateChange} className='min-w-[200px] h-[40px] flex items-center' />
                   <Button
                     variant='outlined'
                     className='mx-2 w-fit border-none p-0'
