@@ -14,8 +14,6 @@ import {
   InputNumber
 } from "antd";
 import { TypeWriter } from '@/widgets/message';
-import { Configuration, OpenAIApi } from "openai";
-// import.meta.env.VITE_OPENAI_API_KEY;
 
 import countries from "i18n-iso-countries";
 import enLocale from "i18n-iso-countries/langs/en.json";
@@ -41,11 +39,6 @@ export function Home() {
     "What problem/condition are you struggling with?"
   ];
   const [suggestion, setSuggestion] = useState([]);
-  const configuration = new Configuration({
-    // apiKey: VITE_OPENAI_API_KEY,
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
 
   countries.registerLocale(enLocale);
   countries.registerLocale(itLocale);
@@ -89,27 +82,20 @@ export function Home() {
     setIsChatAvailable(true);
     const prompt = { "role": "user", "content": "Generate the 7 suggested questions to help him." };
     const init = [
-      { "role": "system", "content": `You should answer the questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'. The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition.` },
-      { "role": "assistant", "content": "Let me know on how can I help you. Please type in your question below." },
+      { "role": "system", "content": `You should answer the questions related to health or wellness. If the user asks any questions that is NOT related to health or wellness, do not generate an answer. Tell the user 'Sorry I cannot answer anything questions outside of health or wellness'. Please indicate any scientific citations if you are giving any information about medical issues. The user is named ${fullName}, he is aged ${age}. He is from ${country}. He believes he is struggling with ${problem} condition.` },
+      { "role": "assistant", "content": "Let me know on how can I help you! Please type in your question below, please give me as much detail as possible about your condition so I can advise you appropriately." },
     ];
     setMessages(init);
     setIsloading(true);
-    try {
-      const result = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [
-          ...init,
-          prompt
-        ]
+    axios.post("https://18.212.49.246/api/new/", { messages: [...init, prompt] })
+      .then((res) => {
+        setSuggestion(res.data.split("\n"));
+        setIsloading(false);
+      }).catch((err) => {
+        notification.warning({ message: "Failed to generate AI answer" });
+        console.log(err);
+        setIsloading(false);
       });
-      let list = [];
-      list = result.data.choices[0].message.content.split("\n");
-      setSuggestion(list);
-    } catch (e) {
-      notification.warning({ message: "Failed to generate AI answer" });
-      console.log(e);
-    }
-    setIsloading(false);
   };
 
   const handleProblemKeyDown = (e) => {
@@ -123,21 +109,18 @@ export function Home() {
     let prompt_data = messages;
     prompt_data.push({ "role": "user", "content": prompt });
     setMessages(prompt_data);
-
-    try {
-      const result = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: prompt_data,
+    axios.post("https://18.212.49.246/api/new/", { messages: prompt_data })
+      .then((res) => {
+        let list = messages;
+        list.push(res.data);
+        setMessages(list);
+        setInput("");
+        setIsloading(false);
+      }).catch((err) => {
+        notification.warning({ message: "Failed to generate AI answer" });
+        console.log(err);
+        setIsloading(false);
       });
-      let list = messages;
-      list.push({ "role": "assistant", "content": result.data.choices[0].message.content })
-      setMessages(list);
-    } catch (e) {
-      notification.warning({ message: "Failed to generate AI answer" });
-      console.log(e);
-    }
-    setInput("");
-    setIsloading(false);
   };
 
   const handleInputKeyDown = (e) => {
