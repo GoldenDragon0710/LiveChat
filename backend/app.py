@@ -73,6 +73,10 @@ def generateNew():
     messages=messages,
     temperature=0.2,
   )
+  cursor = mysql.connection.cursor()
+  cursor.execute("INSERT INTO ChatGPT (prompt) VALUES(%s)", (prompt))
+  mysql.connection.commit()
+  cursor.close()
   return response["choices"][0]["message"]["content"]
 
 @app.route("/api/get", methods=['POST'])

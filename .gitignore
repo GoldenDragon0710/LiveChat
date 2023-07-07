@@ -3,6 +3,8 @@ package-lock.json
 
 frontend/node_modules
 
+admin/node_modules
+
 backend/venv
 backend/.env
 backend/__pycache__
