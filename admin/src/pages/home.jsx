@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
 import {
-  List, ListItem, Card
-} from "@material-tailwind/react";
-import {
+  List,
   notification,
 } from "antd";
 
 export function Home() {
-  const [messages, setMessages] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [flag, setFlag] = useState(false);
 
   useEffect(() => {
     getMessages();
@@ -20,26 +19,26 @@ export function Home() {
         console.log(res);
         // setMessages(res.data);
       }).catch((err) => {
-        notification.warning({ message: "Failed to get prompts." });
         console.log(err);
       });
   };
 
   return (
     <>
-      <div className="relative container mx-auto p-4 flex flex-col items-center">
+      <div className="relative mx-auto p-4 flex items-center">
         <div className='w-full flex my-3'>
-          <Card className="w-full">
-            <List>
-              {
-                messages && messages.map((item, idx) => {
-                  return (
-                    <ListItem key={idx}>{item}</ListItem>
-                  )
-                })
-              }
-            </List>
-          </Card>
+          <List
+            bordered
+            dataSource={messages}
+            className='w-full h-full'
+            renderItem={(item) => 
+              <List.Item
+                className='text-left hover:cursor-pointer hover:bg-blue-gray-300' 
+                value={item}
+              >
+                {item}
+              </List.Item>}
+          />
         </div>
       </div>
     </>
