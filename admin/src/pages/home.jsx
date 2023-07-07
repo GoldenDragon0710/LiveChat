@@ -15,7 +15,7 @@ export function Home() {
   }, []);
 
   const getMessages = () => {
-    axios.get("https://18.212.49.246/api/get")
+    axios.get("https://18.208.152.144/api/get")
       .then((res) => {
         console.log(res);
         // setMessages(res.data);
