@@ -34,7 +34,7 @@ def generateNew():
   response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=messages,
-    temperature=0.2,
+    temperature=0.25,
   )
   cursor = mysql.connection.cursor()
   cursor.execute("INSERT INTO ChatGPT (prompt) VALUES(%s)", (prompt))
